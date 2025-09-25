@@ -1,0 +1,55 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Restaurant ChatBot</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="/socket.io/socket.io.js"></script>
+  </head>
+  <body>
+    <div class="chat-container">
+      <div class="chat-header">
+        <h1>🍕 Restaurant ChatBot</h1>
+        <p>Welcome! How can I help you today?</p>
+      </div>
+
+      <div class="chat-messages" id="chatMessages">
+        <div class="message bot-message">
+          <div class="message-content">
+            <p>Welcome to our restaurant! Please select an option:</p>
+            <div class="options">
+              <button class="option-btn" data-option="1">
+                1 - Place an order
+              </button>
+              <button class="option-btn" data-option="99">
+                99 - Checkout order
+              </button>
+              <button class="option-btn" data-option="98">
+                98 - Order history
+              </button>
+              <button class="option-btn" data-option="97">
+                97 - Current order
+              </button>
+              <button class="option-btn" data-option="0">
+                0 - Cancel order
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="chat-input">
+        <input
+          type="text"
+          id="messageInput"
+          placeholder="Type your option or message..."
+        />
+        <button id="sendButton">Send</button>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
