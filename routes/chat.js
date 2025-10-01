@@ -275,6 +275,16 @@ async function handleOrderHistory(user) {
     };
   }
 
+  function formatOrderDate(order) {
+    const date = order.placedAt || order.paidAt || order.createdAt;
+    if (!date) return "N/A";
+    try {
+      return new Date(date).toLocaleDateString();
+    } catch (_) {
+      return "N/A";
+    }
+  }
+
   const historyText = orders
     .map(
       (order, index) =>
@@ -282,7 +292,7 @@ async function handleOrderHistory(user) {
           order.total
         }\n• Status: ${
           order.status
-        }\n• Date: ${order.placedAt.toLocaleDateString()}\n`
+        }\n• Date: ${formatOrderDate(order)}\n`
     )
     .join("\n");
 

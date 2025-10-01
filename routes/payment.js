@@ -79,7 +79,7 @@ router.post("/initialize", async (req, res) => {
 
         if (paystackResponse.status && paystackResponse.data) {
           // Update order with payment reference
-          order.paymentReference = paymentData.reference;
+          order.paymentReference = paystackResponse.data.reference;
           await order.save();
 
           console.log(
@@ -206,6 +206,9 @@ router.get("/verify", async (req, res) => {
         if (order) {
           order.status = "paid";
           order.paymentStatus = "success";
+          if (!order.placedAt) {
+            order.placedAt = new Date();
+          }
           order.paidAt = new Date();
           await order.save();
 
@@ -469,18 +472,22 @@ router.post("/verify", async (req, res) => {
     });
 
     if (!order) {
+      // If the order is not found yet, treat as pending to avoid false failures
       return res.json({
-        status: false,
-        message: "Order not found",
+        status: true,
+        data: { status: "pending" },
       });
     }
 
-    // For demo purposes, we'll consider any payment with "demo_success" as successful
-    if (reference.includes("success")) {
-      order.status = "paid";
-      order.paymentStatus = "success";
-      await order.save();
-
+    // Determine current known status
+    if (order.paymentStatus === "success" || order.status === "paid") {
+      if (!order.placedAt) {
+        order.placedAt = new Date();
+      }
+      if (!order.paidAt) {
+        order.paidAt = new Date();
+        await order.save();
+      }
       return res.json({
         status: true,
         message: "Payment verified successfully",
@@ -490,15 +497,20 @@ router.post("/verify", async (req, res) => {
           status: "success",
         },
       });
-    } else {
-      order.paymentStatus = "failed";
-      await order.save();
+    }
 
+    if (order.paymentStatus === "failed") {
       return res.json({
         status: false,
         message: "Payment verification failed",
       });
     }
+
+    // Otherwise, still pending
+    return res.json({
+      status: true,
+      data: { status: "pending" },
+    });
   } catch (error) {
     console.error("Payment verification error:", error);
     res.status(500).json({

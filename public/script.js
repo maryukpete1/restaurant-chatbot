@@ -114,6 +114,8 @@ class ChatBot {
             "❌ Payment failed or was cancelled.",
             getMainOptions()
           );
+        } else if (data.status && data.data && data.data.status === "pending") {
+          // keep polling silently
         }
         // If still pending, continue checking
       } catch (error) {

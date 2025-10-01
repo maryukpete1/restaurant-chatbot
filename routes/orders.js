@@ -23,8 +23,15 @@ router.get("/history/:userId", async (req, res) => {
       userSession: req.params.userId,
       status: { $in: ["placed", "paid"] },
     })
-      .sort({ placedAt: -1 })
-      .populate("items.menuItem");
+      .populate("items.menuItem")
+      .exec();
+
+    // Sort with fallback to createdAt if placedAt missing
+    orders.sort((a, b) => {
+      const aTime = (a.placedAt || a.createdAt || 0).getTime ? (a.placedAt || a.createdAt).getTime() : 0;
+      const bTime = (b.placedAt || b.createdAt || 0).getTime ? (b.placedAt || b.createdAt).getTime() : 0;
+      return bTime - aTime;
+    });
 
     res.json(orders);
   } catch (error) {
